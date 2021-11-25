@@ -23,7 +23,7 @@ We practice through the standard procedure of quant trading:
 ### Q2: Can you demonstrate high-level workflow and results?<a name="Q2" />
 
 [2.1. Pattern recognition/data preparation (*api_db_interface.py*)](#Q2.1)  
-[2.2. statiscal testing (*prelim_stats.py*)](#Q2.2)   
+[2.2. statistical testing (*prelim_stats.py*)](#Q2.2)   
 [2.3. backtesting/risk management (*backtesting.py*)](#Q2.3)   
 [2.4. real-time deployment (*live.py*)](#Q2.4)   
 
@@ -36,7 +36,7 @@ We observe that, likely due to globalization, there is a correlation between ret
 We download data from various sources (e.g. alphavantage/eodhistoricaldata), preprocess them and store them in a database.
 	
 
-###### 2.2. statiscal testing (*prelim_stats.py*) <a name="Q2.2" />
+###### 2.2. statistical testing (*prelim_stats.py*) <a name="Q2.2" />
 
 Competing models:
 1. Neural network (nn): take today's Nikkei 225, FTSE 100, Stockxx 50 and effective federal funds rate data as input and outputs the expected return of S&P 500.
@@ -46,9 +46,8 @@ Now we perform Mcnemar test (with \alpha = 0.01), where a prediction is correct 
 
 We obtain the following contingency table and results:
 
-
 |	|	mc correct |    mc incorrect  |
-	|----|---|--|
+|----|---|--|
 |**nn correct** |94	|		 80 |
 |**nn incorrect** |27|			 33|
 
@@ -66,12 +65,12 @@ In our strategy, the neural network's raw prediction gets refined through volati
 
 We simulate transaction costs of Alpaca trading API [\[1\]](#Ref1). A sample run with initial cash $1M produces the following:
 
-![sample_run.png](https://github.com/SmoothKen/Quant_Trading_Project/main/sample_run.png?raw=true)	
+![sample_run.png](https://github.com/SmoothKen/Quant_Trading_Project/blob/main/sample_run.png?raw=true)	
 
 where the top chart plots the OHLCV data of S&P 500 and the bottom chart contrasts the performance between our strategy (green) and the buy-and-hold strategy (purple) in terms of equity balance.
 	
 	
-Our risk management pipeline is configurable through a parameter A. The highr the A, the more risk-averse the trader is. The following are backtesting results assuming various risk appetite:
+Our risk management pipeline is configurable through a parameter A. The higher the A, the more risk-averse the trader is. The following are backtesting results assuming various risk appetite:
 
 
 |   | Neutral (A = 0) |  Slightly averse (A = 0.1) | Very averse (A=1) |
@@ -87,16 +86,16 @@ max_drawdown | -5.0% |  -4.8% | -3.1% |
 
 
 ###### 2.4. real-time deployment (*live.py*) <a name="Q2.4" />
-Ongoing experiment. The algorithm will automatically fetch data and make trades using Alpaca API at 9:30 Eastern time every trading day without traders' attendence.
+Ongoing experiment. The algorithm will automatically fetch data and make trades using Alpaca API at 9:30 Eastern time every trading day without traders' attendance.
 	
-Seversal safety checks are implemented to insure against hardware/internet failure. This is another aspect of risk management.
+Several safety checks are implemented to insure against hardware/internet failure. This is another aspect of risk management.
 
 
 
 ### Q3: Can I hear some technical discussions? <a name="Q3" />
 
 [3.1: Pattern recognition/data preparation (*api_db_interface.py*)](#Q3.1)  
-[3.2. statiscal testing (*prelim_stats.py*)](#Q3.2)   
+[3.2. statistical testing (*prelim_stats.py*)](#Q3.2)   
 [3.3. backtesting/risk management (*backtesting.py*)](#Q3.3)   
 [3.4. real-time deployment (*live.py*)](#Q3.4)   
 
@@ -106,12 +105,12 @@ For customization purposes, we directly interact with the REST APIs using aiohtt
 
 Note that there is a overlap between trading time of LSE, Euronext and NYSE/Nasdaq. Hence while we use end-of-day data for Nikkei 225, we can only use before-NYSE-open data for FTSE 100 and Stockxx 50.
 
-###### 3.2. statiscal testing (*prelim_stats.py*) <a name="Q3.2" />
+###### 3.2. statistical testing   (*prelim_stats.py*) <a name="Q3.2" />
 
 Notice that we choose Mcnemar test instead of paired t-test [\[2\]](#Ref2). This design choice is made because of preliminary observations that using exact values introduces unnecessary risks.
 
 
-Despite evaluating classfiers rather than properties of time series itself (e.g. trend), we technically should still consider the time correlation among data. Advanced statistical tests, e.g. [\[3\]](#Ref3), can be used to address this.
+Despite evaluating classifiers rather than properties of time series itself (e.g. trend), we technically should still consider the time correlation among data. Advanced statistical tests, e.g. [\[3\]](#Ref3), can be used to address this.
 
 
 ###### 3.3. backtesting/risk management (*backtesting.py*) <a name="Q3.3" />
@@ -121,9 +120,9 @@ We find that LSTM layers outperforms dense layers and simple recurrent layers. R
 
 We want make the risk management pipeline configurable, Volatility is not a convenient candidate as it requires traders to constantly lookup the current prices. Instead, our choice of coefficient __A__ is a variation of the absolute risk aversion coefficient __a__ [\[5\]](#Ref5), as defined by
 
-![utility_formula.png](https://github.com/SmoothKen/Quant_Trading_Project/main/utility_formula.png?raw=true)
+![utility_formula.png](https://github.com/SmoothKen/Quant_Trading_Project/blob/main/utility_formula.png?raw=true)
 
-As we can see from the results, although risk-aversion (larger __A__) reduces exposure to large drawdowns, this benefit is offseted by smaller gains and transaction costs. This is because we frequently decide to exit instead of holding the position on the volatile days.
+As we can see from the results, although risk-aversion (larger __A__) reduces exposure to large drawdowns, this benefit is offsetted by smaller gains and transaction costs. This is because we frequently decide to exit instead of holding the position on the volatile days.
 
 
 ###### 3.4. real-time deployment (*live.py*) <a name="Q3.4" />
@@ -156,8 +155,7 @@ Stackexchange](https://stats.stackexchange.com/questions/20013/mcnemar-s-test-or
 \[3\]<a name="Ref3" />  [Pesaran, M. Hashem, and Allan Timmermann.   
 “A Simple Nonparametric Test of Predictive Performance.”  
 Journal of Business & Economic Statistics, vol. 10, no. 4 ](https://www.jstor.org/stable/1391822)  
-\[4\]<a name="Ref4" />  [Sezer, Omer Berat.  
-"Financial time series forecasting with deep learning:  
-A systematic literature review: 2005–2019."   
+\[4\]<a name="Ref4" />  [Sezer, Omer Berat  
+"Financial time series forecasting with deep learning: A systematic literature review: 2005–2019."   
 Applied Soft Computing 90 (2020): 106181.](https://arxiv.org/pdf/1911.13288.pdf)  
-\[5\]<a name="Ref5" />  [Rao, Ashwin. "Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)
+\[5\]<a name="Ref5" />  [Rao, Ashwin "Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)
