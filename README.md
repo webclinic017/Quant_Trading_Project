@@ -22,14 +22,14 @@ We practice through the standard procedure of quant trading:
  
 ### Q2: Can you demonstrate high-level workflow and results?<a name="Q2" />
 
-[2.1. Pattern recognition/data preparation (*api_db_interface.py*)](#Q2.1)  
+[2.1. pattern recognition/data preparation (*api_db_interface.py*)](#Q2.1)  
 [2.2. statistical testing (*prelim_stats.py*)](#Q2.2)   
 [2.3. backtesting/risk management (*backtesting.py*)](#Q2.3)   
 [2.4. real-time deployment (*live.py*)](#Q2.4)   
 
 
 
-###### 2.1. Pattern recognition/data preparation (*api_db_interface.py*) <a name="Q2.1" />
+###### 2.1. pattern recognition/data preparation (*api_db_interface.py*) <a name="Q2.1" />
 
 We observe that, likely due to globalization, there is a correlation between return of S&P 500 and that of market indices in Japan (Nikkei 225), Europe (Stoxx 50) and Britain (FTSE 100).
 
@@ -94,7 +94,7 @@ Several safety checks are implemented to insure against hardware/internet failur
 
 ### Q3: Can I hear some technical discussions? <a name="Q3" />
 
-[3.1: Pattern recognition/data preparation (*api_db_interface.py*)](#Q3.1)  
+[3.1. pattern recognition/data preparation (*api_db_interface.py*)](#Q3.1)  
 [3.2. statistical testing (*prelim_stats.py*)](#Q3.2)   
 [3.3. backtesting/risk management (*backtesting.py*)](#Q3.3)   
 [3.4. real-time deployment (*live.py*)](#Q3.4)   
@@ -135,7 +135,7 @@ The algorithm, when not trading, will check if the file in which we save the neu
 ### Q4: What did you learn from this project? <a name="Q4" />
 Among various lessons and techniques,
 
-- Be cautious about pure technical indicators based trading strategies (e.g. RSI, MACD etc).These indicators suffer from low signal-to-noise ratio and non-repeating black swans.
+- Be cautious about pure technical indicators based trading strategies (e.g. RSI, MACD etc). These indicators suffer from low signal-to-noise ratio and non-repeating black swans.
 
 - Efficient market hypothesis makes our life hard. Groups of professional miners make it even harder. Hence, as the old saying goes, if you cannot beat them, join (and learn from) them.
 
