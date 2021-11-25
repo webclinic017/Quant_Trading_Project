@@ -46,6 +46,7 @@ Now we perform Mcnemar test (with \alpha = 0.01), where a prediction is correct 
 
 We obtain the following contingency table and results:
 
+
 |	|	mc correct |    mc incorrect  |
 	|----|---|--|
 |**nn correct** |94	|		 80 |
@@ -65,7 +66,7 @@ In our strategy, the neural network's raw prediction gets refined through volati
 
 We simulate transaction costs of Alpaca trading API [\[1\]](#Ref1). A sample run with initial cash $1M produces the following:
 
-![sample_run.png](https://github.com/SmoothKen/Quant_Trading_Project/master/sample_run.png?raw=true)	
+![sample_run.png](https://github.com/SmoothKen/Quant_Trading_Project/main/sample_run.png?raw=true)	
 
 where the top chart plots the OHLCV data of S&P 500 and the bottom chart contrasts the performance between our strategy (green) and the buy-and-hold strategy (purple) in terms of equity balance.
 	
@@ -120,7 +121,7 @@ We find that LSTM layers outperforms dense layers and simple recurrent layers. R
 
 We want make the risk management pipeline configurable, Volatility is not a convenient candidate as it requires traders to constantly lookup the current prices. Instead, our choice of coefficient __A__ is a variation of the absolute risk aversion coefficient __a__ [\[5\]](#Ref5), as defined by
 
-![utility_formula.png](https://github.com/SmoothKen/Quant_Trading_Project/master/utility_formula.png?raw=true)
+![utility_formula.png](https://github.com/SmoothKen/Quant_Trading_Project/main/utility_formula.png?raw=true)
 
 As we can see from the results, although risk-aversion (larger __A__) reduces exposure to large drawdowns, this benefit is offseted by smaller gains and transaction costs. This is because we frequently decide to exit instead of holding the position on the volatile days.
 
@@ -155,9 +156,8 @@ Stackexchange](https://stats.stackexchange.com/questions/20013/mcnemar-s-test-or
 \[3\]<a name="Ref3" />  [Pesaran, M. Hashem, and Allan Timmermann.   
 “A Simple Nonparametric Test of Predictive Performance.”  
 Journal of Business & Economic Statistics, vol. 10, no. 4 ](https://www.jstor.org/stable/1391822)  
-\[4\]<a name="Ref4" />  [Sezer, Omer Berat  
+\[4\]<a name="Ref4" />  [Sezer, Omer Berat.  
 "Financial time series forecasting with deep learning:  
 A systematic literature review: 2005–2019."   
 Applied Soft Computing 90 (2020): 106181.](https://arxiv.org/pdf/1911.13288.pdf)  
-\[5\]<a name="Ref5" />  [Rao, Ashwin  
-"Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)
+\[5\]<a name="Ref5" />  [Rao, Ashwin. "Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)
