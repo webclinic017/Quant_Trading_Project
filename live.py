@@ -3,7 +3,7 @@ import sys
 
 try:
 	from prelim_stats import Net
-	from api_db_interface import save_path, generic_get, place_order, AP_BASE, close, AP_DATA, live_result_path
+	from api_db_interface import save_path, generic_get, place_order, AP_BASE, close, AP_DATA, live_result_path, proj_folder
 	import asyncio
 
 	import torch
@@ -13,20 +13,20 @@ except ImportError:
 	pip.main(['install', "pandas", "aiohttp", "websocket-client"])
 	sys.exit("Installed new modules, please rerun the script")
 
-folder = "/home/ken/Downloads/"
+
 # prepare input data for neural network
 async def prepare_dataset(now):
 	tasks = []
 	loop = asyncio.get_event_loop()
 	
-	tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/real-time/N225.INDX?fmt=json&s=JPY.FOREX,STOXX50E.INDX,EUR.FOREX,FTSE.INDX,GBP.FOREX&api_token=", "eod", folder + "realtime.html")))
+	tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/real-time/N225.INDX?fmt=json&s=JPY.FOREX,STOXX50E.INDX,EUR.FOREX,FTSE.INDX,GBP.FOREX&api_token=", "eod", proj_folder + "realtime.html")))
 
 	
 	forexes = ["JPY", "EUR", "GBP"]
 	for symbol in forexes:
-		tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".FOREX?fmt=json&api_token=", "eod", folder + symbol + ".html")))	
+		tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".FOREX?fmt=json&api_token=", "eod", proj_folder + symbol + ".html")))	
 
-	tasks.append(loop.create_task(generic_get("https://markets.newyorkfed.org/read?productCode=50&eventCodes=500&limit=25&startPosition=0&sort=postDt:-1&format=xml", "newyorkfed", folder + "interest.html")))
+	tasks.append(loop.create_task(generic_get("https://markets.newyorkfed.org/read?productCode=50&eventCodes=500&limit=25&startPosition=0&sort=postDt:-1&format=xml", "newyorkfed", proj_folder + "interest.html")))
 
 	
 	results = await asyncio.gather(*tasks)
