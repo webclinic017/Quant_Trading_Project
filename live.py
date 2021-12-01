@@ -13,8 +13,55 @@ except ImportError:
 	pip.main(['install', "pandas", "aiohttp", "websocket-client"])
 	sys.exit("Installed new modules, please rerun the script")
 
-
+folder = "/home/ken/Downloads/"
 # prepare input data for neural network
+async def prepare_dataset(now):
+	tasks = []
+	loop = asyncio.get_event_loop()
+	
+	tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/real-time/N225.INDX?fmt=json&s=JPY.FOREX,STOXX50E.INDX,EUR.FOREX,FTSE.INDX,GBP.FOREX&api_token=", "eod", folder + "realtime.html")))
+
+	
+	forexes = ["JPY", "EUR", "GBP"]
+	for symbol in forexes:
+		tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".FOREX?fmt=json&api_token=", "eod", folder + symbol + ".html")))	
+
+	tasks.append(loop.create_task(generic_get("https://markets.newyorkfed.org/read?productCode=50&eventCodes=500&limit=25&startPosition=0&sort=postDt:-1&format=xml", "newyorkfed", folder + "interest.html")))
+
+	
+	results = await asyncio.gather(*tasks)
+	inputs = []
+	
+	# first process index 1,2,3 so that we remain with the open bar of forex
+	now = now.strftime('%Y-%m-%d')
+	for index in range(1,4):
+		open_bar = None
+		for bar in results[index]:
+			if bar["datetime"][0:10] == now:
+				open_bar = bar
+				break
+		results[index] = open_bar
+		
+		
+		
+	symbols = ["N225", "JPY", "STOXX50E", "EUR", "FTSE", "GBP"]
+	for index, bar in enumerate(results[0]):
+		if index % 2 == 0:
+			open_price = bar["open"]
+		else:
+			open_price = results[(index+1)//2]["open"]
+			
+		latest_price = bar["close"]
+		inputs.append(round((latest_price - open_price)/open_price,4))
+
+		print(symbols[index], open_price, latest_price)
+			
+	inputs.append(results[-1])
+	return inputs
+
+
+
+'''
 async def prepare_dataset(now):
 	inputs = []
 	
@@ -23,31 +70,42 @@ async def prepare_dataset(now):
 	loop = asyncio.get_event_loop()
 	for index, symbol in enumerate(symbols):
 		if index % 2 == 0:
-			tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".INDX?fmt=json&api_token=", "eod")))
+			tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".INDX?fmt=json&api_token=", "eod", folder + symbol + ".html")))
 		else:
-			tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".FOREX?fmt=json&api_token=", "eod")))		
+			tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/intraday/" + symbol + ".FOREX?fmt=json&api_token=", "eod", folder + symbol + ".html")))		
 	
-	tasks.append(loop.create_task(generic_get("https://markets.newyorkfed.org/read?productCode=50&eventCodes=500&limit=25&startPosition=0&sort=postDt:-1&format=xml", "newyorkfed")))
+	tasks.append(loop.create_task(generic_get("https://markets.newyorkfed.org/read?productCode=50&eventCodes=500&limit=25&startPosition=0&sort=postDt:-1&format=xml", "newyorkfed", folder + "interest.html")))
 	
-	tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/real-time/N225.INDX?fmt=json&s=JPY.FOREX,STOXX50E.INDX,EUR.FOREX,FTSE.INDX,GBP.FOREX&api_token=", "eod")))
+	tasks.append(loop.create_task(generic_get("https://eodhistoricaldata.com/api/real-time/N225.INDX?fmt=json&s=JPY.FOREX,STOXX50E.INDX,EUR.FOREX,FTSE.INDX,GBP.FOREX&api_token=", "eod", folder + "realtime.html")))
 	
 	results = await asyncio.gather(*tasks)
+		
 	now = now.strftime('%Y-%m-%d')
+	
 	for index, close_bar in enumerate(results[-1]):
+		open_price = None
 		for bar_id, bar in enumerate(results[index]):
-			if bar["datetime"][0:9] < now:
-				if bar_id != len(results[index]) - 1:
-					open_price = results[index][bar_id+1]["open"]
-					break
-				else:
-					return None
-			
+			# print(bar["datetime"][0:10])
+			if bar["datetime"][0:10] == now:
+				open_price = bar["open"]
+				break
+
+		# no open bar today, use close bar yesterday
+		if open_price == None:
+			print(index, "today's open price not available, using yesterday's close price...")
+			open_price = results[index][-1]["close"]
+		
 		close_price = close_bar["close"]
+		print(now, index, open_price, close_price)
 		# print(open_price, close_price)
-		results[index] = round((close_price - open_price)/open_price,4)
+		results[index] = round((close_price - open_price)/open_price,4)		
+		
 	del results[-1]
 	return results
-			
+'''
+
+
+		
 # note that alpaca does not support directly going from long to short (and vice versa)< hence this function acts in between live() and place_order()
 async def switch_pos(symbol, pos, target_side):
 
@@ -76,13 +134,16 @@ async def switch_pos(symbol, pos, target_side):
 		
 		target_pos = int(target_side*cash*0.95/now_price)
 		result = await place_order(symbol, target_pos, now_price)
-		if not result:
+		if result:
+			print("pos:", pos, "->", target_pos)
+			pos = target_pos
+			break
+		else:
 			retry += 1
 			time.sleep(1)
 			continue
-		else:
-			print("pos:", pos, "->", target_pos)
-			pos = target_pos
+		
+			
 			
 	return pos
 
@@ -102,11 +163,18 @@ async def live():
 	pos_response = await generic_get(AP_BASE + "/v2/positions/" + "SPY", "alpaca")
 	pos = int(pos_response["qty"])
 
+
+
 	while True:
 		now = datetime.now(tz=gettz('US/Eastern'))
 		open_start = now.replace(hour=9, minute=30, second=0, microsecond=0)
 		open_end = now.replace(hour=9, minute=35, second=0, microsecond=0)
 		print(now.hour, ":", now.minute, "pos: ", pos, end='\r')
+		
+		# realtime_x = await prepare_dataset(now)
+		# net_ans = net(torch.tensor(realtime_x)).tolist()[0]		
+		# print(realtime_x, net_ans)
+		# time.sleep(200000)
 		
 		if now >= open_start and now <= open_end:
 			mo_response = await generic_get(AP_BASE + "/v2/clock", "alpaca")
