@@ -35,7 +35,7 @@ We observe that, likely due to globalization, there seems to be a correlation be
 
 We download data from various sources (e.g. alphavantage/eodhistoricaldata), preprocess them and store them in a database.
 
-Once data is ready, we use a ARIMAX(1,0,0) model to quickly confirm our ideas. To avoid collinearity, we perform regressions between SPY 500 and each of Nikkei 225, Stockxx 50, and FTSE 100 separately. 
+Once data is ready, we use a ARIMAX(1,0,0) model to quickly confirm our ideas. To avoid collinearity, we perform regressions between S&P 500 and each of Nikkei 225, Stockxx 50, and FTSE 100 separately. 
 
 | Stock | intercept | slope | AR coefficient | Ljung-Box p-value |
 | --- | ---| ----| ---| ---|
@@ -190,6 +190,6 @@ Journal of Business & Economic Statistics, vol. 10, no. 4 ](https://www.jstor.or
 \[4\]<a name="Ref4" />  [Sezer, Omer Berat  
 "Financial time series forecasting with deep learning: A systematic literature review: 2005–2019."   
 Applied Soft Computing 90 (2020): 106181.](https://arxiv.org/pdf/1911.13288.pdf)  
-\[5\]<a name="Ref5" />  [Rao, Ashwin "Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)
-\[6\]<a name="Ref6" />  [Testing for autocorrelation: Ljung-Box versus Breusch-Godfrey - Stackexchange](https://stats.stackexchange.com/questions/148004/testing-for-autocorrelation-ljung-box-versus-breusch-godfrey)
+\[5\]<a name="Ref5" />  [Rao, Ashwin "Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)  
+\[6\]<a name="Ref6" />  [Testing for autocorrelation: Ljung-Box versus Breusch-Godfrey - Stackexchange](https://stats.stackexchange.com/questions/148004/testing-for-autocorrelation-ljung-box-versus-breusch-godfrey)  
 \[7\]<a name="Ref7" /> [Durbin-Watson Significance Tables](https://www3.nd.edu/~wevans1/econ30331/Durbin_Watson_tables.pdf)
