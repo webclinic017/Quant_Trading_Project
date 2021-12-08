@@ -31,10 +31,21 @@ We practice through the standard procedure of quant trading:
 
 ###### 2.1. pattern recognition/data preparation (*api_db_interface.py*) <a name="Q2.1" />
 
-We observe that, likely due to globalization, there is a correlation between return of S&P 500 and that of market indices in Japan (Nikkei 225), Europe (Stoxx 50) and Britain (FTSE 100).
+We observe that, likely due to globalization, there seems to be a correlation between return of S&P 500 and that of market indices in Japan (Nikkei 225), Europe (Stoxx 50) and Britain (FTSE 100).
 
 We download data from various sources (e.g. alphavantage/eodhistoricaldata), preprocess them and store them in a database.
-	
+
+Once data is ready, we use a ARIMAX(1,0,0) model to quickly confirm our ideas. To avoid collinearity, we perform regressions between SPY 500 and each of Nikkei 225, Stockxx 50, and FTSE 100 separately. 
+
+| Stock | intercept | slope | AR coefficient | Ljung-Box p-value |
+| --- | ---| ----| ---| ---|
+| Nikkei 225 | -2.447e-05 | 0.2135 | -0.1656 | 0.83|
+| Stockxx 50 | 0.0001 | 0.6035 | -0.2271 | 0.75 |
+| FTSE 100 | -0.0002 | 0.7577 | -0.4129 | 0.74|
+
+Note that the slopes are not close to 1. But this is fine since they are not close to 0 either and our intention here is not to do the actual trading with these regression models.
+
+
 
 ###### 2.2. statistical testing (*prelim_stats.py*) <a name="Q2.2" />
 
@@ -101,9 +112,30 @@ Several safety checks are implemented to insure against hardware/internet failur
 
 
 ###### 3.1. pattern recognition/data preparation (*api_db_interface.py*) <a name="Q3.1" />
-For customization purposes, we directly interact with the REST APIs using aiohttp library.
+1. For customization purposes, we directly interact with the REST APIs using aiohttp library.
 
-Note that there is a overlap between trading time of LSE, Euronext and NYSE/Nasdaq. Hence while we use end-of-day data for Nikkei 225, we can only use before-NYSE-open data for FTSE 100 and Stockxx 50.
+2. Note that there is a overlap between trading time of LSE, Euronext and NYSE/Nasdaq. Hence while we use end-of-day data for Nikkei 225, we can only use before-NYSE-open data for FTSE 100 and Stockxx 50.
+
+3. During pattern recognition, since we are dealing the stock returns rather than the stock prices, we may wonder if linear regression is sufficient. However here are the Durbin-Watson statistics: 
+
+|Stock |DW statistics |
+|---|---|
+|Nikkei 225 | 2.331|
+|Stockxx 50|2.440|
+|FSTE 100|2.808|
+
+Now given the sample size of approximately 200, the critical value (\alpha = 0.05) is 2.24 [\[7\]](#Ref7). Hence we conclude that there is signfiicant autocorrelation in the residual and therefore linear regression is not a suitable model.
+
+
+4. Also, there are some arguments against Ljung-Box test on ARIMAX models [\[6\]](#Ref6). Hence as safety check, we perform Breusch-Godfrey tests and obtain the following statistics, which do not trigger alarms at \alpha = 0.05.
+
+|Stock | BG statistics | p-value|
+|---|---|----|
+|Nikkei 225 |12.14| 0.28|
+|Stockxx 50|17.44| 0.07|
+|FTSE 100|13.32|0.21|
+
+
 
 ###### 3.2. statistical testing   (*prelim_stats.py*) <a name="Q3.2" />
 
@@ -146,7 +178,7 @@ Among various lessons and techniques,
 Please feel free to contact me through one of the following:
 
 [Keren's Email (link)](mailto:&#107;5&#115;&#104;&#97;&#111;&#64;ucsd&#46;&#101;&#100;&#117;)  
-[Keren's Linkedin (link)](www.linkedin.com/in/keren-shao)
+[Keren's Linkedin (link)](https://www.linkedin.com/in/keren-shao)
 
 ### References <a name="Ref" /> 
 \[1\]<a name="Ref1" />  [Pricing and fees - Alpaca Forum](https://forum.alpaca.markets/t/pricing-and-fees/2309)  
@@ -159,3 +191,5 @@ Journal of Business & Economic Statistics, vol. 10, no. 4 ](https://www.jstor.or
 "Financial time series forecasting with deep learning: A systematic literature review: 2005–2019."   
 Applied Soft Computing 90 (2020): 106181.](https://arxiv.org/pdf/1911.13288.pdf)  
 \[5\]<a name="Ref5" />  [Rao, Ashwin "Understanding Risk-Aversion through Utility Theory"](https://web.stanford.edu/class/cme241/lecture_slides/UtilityTheoryForRisk.pdf)
+\[6\]<a name="Ref6" />  [Testing for autocorrelation: Ljung-Box versus Breusch-Godfrey - Stackexchange](https://stats.stackexchange.com/questions/148004/testing-for-autocorrelation-ljung-box-versus-breusch-godfrey)
+\[7\]<a name="Ref7" /> [Durbin-Watson Significance Tables](https://www3.nd.edu/~wevans1/econ30331/Durbin_Watson_tables.pdf)
